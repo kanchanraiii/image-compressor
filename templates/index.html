@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Compressor</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #c3ecf7, #e1bee7);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-attachment: fixed;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px 25px;
+      width: 100%;
+      max-width: 450px;
+      color: #2c3e50;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    h2 {
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      text-align: left;
+      font-weight: 500;
+      color: #34495e;
+    }
+
+    select, input[type="file"], button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: none;
+      border-radius: 10px;
+      font-size: 20px;
+      transition: 0.3s;
+      font-family: inherit;
+    }
+
+    select, input[type="file"] {
+      background: rgba(255, 255, 255, 0.6);
+      color: #2c3e50;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #6c5ce7;
+      color: white;
+      font-weight: bold;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5a4fcf;
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+    }
+
+    .result p {
+      margin: 5px 0;
+      font-size: 20px;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 10px;
+      color: #6c5ce7;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      margin-left: 8px;
+      color: #6c5ce7;
+      font-weight: bold;
+      font-size: 18px;
+      user-select: none;
+    }
+
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: #514896;
+      border-radius: 2px;
+      color: #ffffff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%; 
+      left: 50%;
+      margin-left: -110px; 
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+   
+    .tooltip .tooltiptext::after {
+      content: '';
+      position: absolute;
+      top: 100%; 
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #6c5ce7 transparent transparent transparent;
+    }
+
+   
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .spinner {
+      display: none;
+      margin-top: 30px;
+    }
+
+    .spinner-border {
+      width: 40px;
+      height: 40px;
+      border: 5px solid rgba(255, 255, 255, 0.6);
+      border-top: 5px solid #6c5ce7;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 500px) {
+      h2 {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 25px 20px;
+      }
+
+      select, input, button {
+        font-size: 13px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Image Compressor</h2>
+
+    <form id="compressForm" action="/compress" method="POST" enctype="multipart/form-data">
+      <label for="img_type">Select Image Format:</label>
+      <select name="img_type" id="img_type" required>
+        <option value="jpg">JPG</option>
+        <option value="jpeg">JPEG</option>
+        <option value="png">PNG</option>
+      </select>
+
+      <label for="compression_level" style="display: flex; align-items: center; justify-content: center;">
+        Select Compression Level:
+        <span class="tooltip" aria-label="Compression level info">ℹ
+          <span class="tooltiptext">
+            <strong>High Quality:</strong> Best image quality, larger file size.<br>
+            <strong>Medium Quality:</strong> Balanced quality and file size.<br>
+            <strong>Small Size:</strong> Smaller file size, lower image quality — great for thumbnails.
+          </span>
+        </span>
+      </label>
+      <select name="compression_level" id="compression_level" required>
+        <option value="high">High Quality</option>
+        <option value="medium" selected>Medium Quality</option>
+        <option value="small">Small Size</option>
+      </select>
+
+      <label for="image">Upload Image:</label>
+      <input type="file" name="image" id="image" required>
+
+      <button type="submit">Compress Image</button>
+    </form>
+
+    <div class="spinner" id="spinner">
+      <div class="spinner-border"></div>
+      <p style="margin-top: 10px; font-weight: 500;">Compressing image...</p>
+    </div>
+
+    {% if original_size %}
+      <div class="result">
+        <p><strong>Original Size:</strong> {{ original_size }} KB</p>
+        <p><strong>Compressed Size:</strong> {{ compressed_size }} KB</p>
+        <a href="/{{ download_link }}" download>⬇ Download Compressed Image</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    const form = document.getElementById('compressForm');
+    const spinner = document.getElementById('spinner');
+
+    form.addEventListener('submit', function() {
+      spinner.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
